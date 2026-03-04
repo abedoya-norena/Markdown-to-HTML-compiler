@@ -2,6 +2,7 @@
 Each of the functions in this file takes a single line of input and transforms the line in some way.
 '''
 
+
 def compile_headers(line):
     '''
     Convert markdown headers into <h1>,<h2>,etc tags.
@@ -26,8 +27,8 @@ def compile_headers(line):
     >>> compile_headers('      # this is not a header')
     '      # this is not a header'
     '''
-    for i in range(6,0,-1):
-        prefix = "#"*i + " "
+    for i in range(6, 0, -1):
+        prefix = "#" * i + " "
         if line.startswith(prefix):
             return f"<h{i}>{line[i:]}</h{i}>"
 
@@ -56,10 +57,11 @@ def compile_italic_star(line):
     '*'
     '''
     start = line.find("*")
-    end = line.find("*", start+1)
+    end = line.find("*", start + 1)
 
     if start != -1 and end != -1 and end > start:
-        return line[:start] + "<i>" + line[start+1:end] + "</i>" + line[end+1:]
+        return line[:start] + "<i>" + \
+            line[start + 1:end] + "</i>" + line[end + 1:]
 
     return line
 
@@ -83,13 +85,13 @@ def compile_italic_underscore(line):
     '_'
     '''
     start = line.find("_")
-    end = line.find("_", start+1)
+    end = line.find("_", start + 1)
 
     if start != -1 and end != -1 and end > start:
-        return line[:start] + "<i>" + line[start+1:end] + "</i>" + line[end+1:]
+        return line[:start] + "<i>" + \
+            line[start + 1:end] + "</i>" + line[end + 1:]
 
     return line
-
 
 
 def compile_strikethrough(line):
@@ -113,10 +115,11 @@ def compile_strikethrough(line):
     '~~'
     '''
     start = line.find("~~")
-    end = line.find("~~", start+2)
+    end = line.find("~~", start + 2)
 
     if start != -1 and end != -1:
-        return line[:start] + "<ins>" + line[start+2:end] + "</ins>" + line[end+2:]
+        return line[:start] + "<ins>" + \
+            line[start + 2:end] + "</ins>" + line[end + 2:]
 
     return line
 
@@ -140,10 +143,11 @@ def compile_bold_stars(line):
     '**'
     '''
     start = line.find("**")
-    end = line.find("**", start+2)
+    end = line.find("**", start + 2)
 
     if start != -1 and end != -1:
-        return line[:start] + "<b>" + line[start+2:end] + "</b>" + line[end+2:]
+        return line[:start] + "<b>" + \
+            line[start + 2:end] + "</b>" + line[end + 2:]
 
     return line
 
@@ -168,12 +172,14 @@ def compile_bold_underscore(line):
     '''
 
     start = line.find("__")
-    end = line.find("__", start+2)
+    end = line.find("__", start + 2)
 
     if start != -1 and end != -1:
-        return line[:start] + "<b>" + line[start+2:end] + "</b>" + line[end+2:]
+        return line[:start] + "<b>" + \
+            line[start + 2:end] + "</b>" + line[end + 2:]
 
     return line
+
 
 def compile_code_inline(line):
     '''
@@ -203,12 +209,12 @@ def compile_code_inline(line):
     '```python3'
     '''
     start = line.find("`")
-    end = line.find("`", start+1)
+    end = line.find("`", start + 1)
 
     if start != -1 and end != -1 and not line.strip().startswith("```"):
-        code = line[start+1:end]
-        code = code.replace("<","&lt;").replace(">","&gt;")
-        return line[:start] + "<code>" + code + "</code>" + line[end+1:]
+        code = line[start + 1:end]
+        code = code.replace("<", "&lt;").replace(">", "&gt;")
+        return line[:start] + "<code>" + code + "</code>" + line[end + 1:]
 
     return line
 
@@ -235,9 +241,9 @@ def compile_links(line):
     end = line.find(")", mid)
 
     if start != -1 and mid != -1 and end != -1:
-        text = line[start+1:mid]
-        url = line[mid+2:end]
-        return line[:start] + f'<a href="{url}">{text}</a>' + line[end+1:]
+        text = line[start + 1:mid]
+        url = line[mid + 2:end]
+        return line[:start] + f'<a href="{url}">{text}</a>' + line[end + 1:]
 
     return line
 
@@ -263,8 +269,9 @@ def compile_images(line):
     end = line.find(")", mid)
 
     if start != -1 and mid != -1 and end != -1:
-        alt = line[start+2:mid]
-        url = line[mid+2:end]
-        return line[:start] + f'<img src="{url}" alt="{alt}" />' + line[end+1:]
+        alt = line[start + 2:mid]
+        url = line[mid + 2:end]
+        return line[:start] + \
+            f'<img src="{url}" alt="{alt}" />' + line[end + 1:]
 
     return line

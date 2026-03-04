@@ -31,7 +31,8 @@ If you use AI as a crutch to solve the simple problems for you,
 you will not be able to solve the more difficult problems.
 '''
 
-from markdown_compiler import *
+from markdown_compiler import convert_file
+
 
 def main():
     # process command line arguments
@@ -47,6 +48,7 @@ def main():
 
     # call the main function
     convert_file(args.input_file, args.add_css)
+
 
 if __name__ == '__main__':
     main()
