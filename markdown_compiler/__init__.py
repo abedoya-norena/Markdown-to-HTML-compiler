@@ -143,8 +143,28 @@ def compile_lines(text):
     lines = text.split('\n')
     new_lines = []
     in_paragraph = False
+    in_code_block = False
+
     for line in lines:
-        line = line.strip()
+        stripped = line.strip()
+
+        # handle start/end of ``` code blocks
+        if stripped == "```":
+            if not in_code_block:
+                new_lines.append("<pre>")
+                in_code_block = True
+            else:
+                new_lines.append("</pre>")
+                in_code_block = False
+            continue
+
+        # if inside a code block, output raw text
+        if in_code_block:
+            new_lines.append(line)
+            continue
+
+        line = stripped
+
         if line == '':
             if in_paragraph:
                 line = '</p>'
@@ -153,6 +173,7 @@ def compile_lines(text):
             if line[0] != '#' and not in_paragraph:
                 in_paragraph = True
                 line = '<p>\n' + line
+
             line = compile_headers(line)
             line = compile_strikethrough(line)
             line = compile_bold_stars(line)
@@ -162,7 +183,9 @@ def compile_lines(text):
             line = compile_code_inline(line)
             line = compile_images(line)
             line = compile_links(line)
+
         new_lines.append(line)
+
     new_text = '\n'.join(new_lines)
     return new_text
 
@@ -235,7 +258,7 @@ def minify(html):
     >>> minify('a\n\n\n\n\n\n\n\n\n\n\n\n\n\nb\n\n\n\n\n\n\n\n\n\n')
     'a b'
     '''
-    return html
+    return " ".join(html.split())
 
 
 def convert_file(input_file, add_css):
