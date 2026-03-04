@@ -26,6 +26,7 @@ def compile_headers(line):
     >>> compile_headers('      # this is not a header')
     '      # this is not a header'
     '''
+    
     return line
 
 
