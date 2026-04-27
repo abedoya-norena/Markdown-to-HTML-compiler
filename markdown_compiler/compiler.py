@@ -61,8 +61,8 @@ def markdown_to_html(md: str) -> str:
     '<p>A <em>simple</em> line</p>'
     >>> markdown_to_html('[OpenAI](https://openai.com)')
     '<p><a href="https://openai.com">OpenAI</a></p>'
-    >>> markdown_to_html('## Section\nParagraph with **bold** and *italic*')
-    '<h2>Section</h2>\n<p>Paragraph with <strong>bold</strong> and <em>italic</em></p>'
+    >>> markdown_to_html('## Section\\nParagraph with **bold** and *italic*')
+    '<h2>Section</h2>\\n<p>Paragraph with <strong>bold</strong> and <em>italic</em></p>'
     """
     if not md:
         return ""

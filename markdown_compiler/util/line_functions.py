@@ -26,6 +26,10 @@ def compile_headers(line):
     >>> compile_headers('      # this is not a header')
     '      # this is not a header'
     '''
+    for i in range(6, 0, -1):
+        prefix = '#' * i
+        if line[:i] == prefix and (len(line) == i or line[i] == ' '):
+            return f'<h{i}>{line[i:]}</h{i}>'
     return line
 
 
@@ -50,7 +54,13 @@ def compile_italic_star(line):
     >>> compile_italic_star('*')
     '*'
     '''
-    return line
+    start = line.find('*')
+    if start == -1:
+        return line
+    end = line.find('*', start + 1)
+    if end == -1:
+        return line
+    return line[:start] + '<i>' + line[start+1:end] + '</i>' + compile_italic_star(line[end+1:])
 
 
 def compile_italic_underscore(line):
@@ -71,7 +81,13 @@ def compile_italic_underscore(line):
     >>> compile_italic_underscore('_')
     '_'
     '''
-    return line
+    start = line.find('_')
+    if start == -1:
+        return line
+    end = line.find('_', start + 1)
+    if end == -1:
+        return line
+    return line[:start] + '<i>' + line[start+1:end] + '</i>' + compile_italic_underscore(line[end+1:])
 
 
 def compile_strikethrough(line):
@@ -94,7 +110,13 @@ def compile_strikethrough(line):
     >>> compile_strikethrough('~~')
     '~~'
     '''
-    return line
+    start = line.find('~~')
+    if start == -1:
+        return line
+    end = line.find('~~', start + 2)
+    if end == -1:
+        return line
+    return line[:start] + '<ins>' + line[start+2:end] + '</ins>' + compile_strikethrough(line[end+2:])
 
 
 def compile_bold_stars(line):
@@ -115,7 +137,13 @@ def compile_bold_stars(line):
     >>> compile_bold_stars('**')
     '**'
     '''
-    return line
+    start = line.find('**')
+    if start == -1:
+        return line
+    end = line.find('**', start + 2)
+    if end == -1:
+        return line
+    return line[:start] + '<b>' + line[start+2:end] + '</b>' + compile_bold_stars(line[end+2:])
 
 
 def compile_bold_underscore(line):
@@ -136,7 +164,13 @@ def compile_bold_underscore(line):
     >>> compile_bold_underscore('__')
     '__'
     '''
-    return line
+    start = line.find('__')
+    if start == -1:
+        return line
+    end = line.find('__', start + 2)
+    if end == -1:
+        return line
+    return line[:start] + '<b>' + line[start+2:end] + '</b>' + compile_bold_underscore(line[end+2:])
 
 
 def compile_code_inline(line):
@@ -166,7 +200,18 @@ def compile_code_inline(line):
     >>> compile_code_inline('```python3')
     '```python3'
     '''
-    return line
+    if line.startswith('```'):
+        return line
+    start = line.find('`')
+    if start == -1:
+        return line
+    if start + 2 < len(line) and line[start:start+3] == '```':
+        return line
+    end = line.find('`', start + 1)
+    if end == -1:
+        return line
+    inner = line[start+1:end].replace('<', '&lt;').replace('>', '&gt;')
+    return line[:start] + '<code>' + inner + '</code>' + compile_code_inline(line[end+1:])
 
 
 def compile_links(line):
@@ -186,7 +231,21 @@ def compile_links(line):
     >>> compile_links('this is wrong: [course webpage](https://github.com/mikeizbicki/cmc-csci040')
     'this is wrong: [course webpage](https://github.com/mikeizbicki/cmc-csci040'
     '''
-    return line
+    start = line.find('[')
+    if start == -1:
+        return line
+    end_bracket = line.find(']', start)
+    if end_bracket == -1:
+        return line
+    if end_bracket + 1 >= len(line) or line[end_bracket + 1] != '(':
+        return line
+    start_paren = end_bracket + 1
+    end_paren = line.find(')', start_paren)
+    if end_paren == -1:
+        return line
+    text = line[start+1:end_bracket]
+    url = line[start_paren+1:end_paren]
+    return line[:start] + f'<a href="{url}">{text}</a>' + compile_links(line[end_paren+1:])
 
 
 def compile_images(line):
@@ -205,4 +264,18 @@ def compile_images(line):
     >>> compile_images('This is an image of Mike Izbicki: ![Mike Izbicki](https://avatars1.githubusercontent.com/u/1052630?v=2&s=460)')
     'This is an image of Mike Izbicki: <img src="https://avatars1.githubusercontent.com/u/1052630?v=2&s=460" alt="Mike Izbicki" />'
     '''
-    return line
+    start = line.find('![')
+    if start == -1:
+        return line
+    end_bracket = line.find(']', start + 2)
+    if end_bracket == -1:
+        return line
+    if end_bracket + 1 >= len(line) or line[end_bracket + 1] != '(':
+        return line
+    start_paren = end_bracket + 1
+    end_paren = line.find(')', start_paren)
+    if end_paren == -1:
+        return line
+    alt = line[start+2:end_bracket]
+    src = line[start_paren+1:end_paren]
+    return line[:start] + f'<img src="{src}" alt="{alt}" />' + compile_images(line[end_paren+1:])
