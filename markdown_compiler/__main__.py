@@ -31,22 +31,63 @@ If you use AI as a crutch to solve the simple problems for you,
 you will not be able to solve the more difficult problems.
 '''
 
-from markdown_compiler import *
+from markdown_compiler.util.line_functions import (
+    compile_headers,
+    compile_italic_star,
+    compile_italic_underscore,
+    compile_strikethrough,
+    compile_bold_stars,
+    compile_bold_underscore,
+    compile_code_inline,
+    compile_links,
+    compile_images,
+)
+
+CSS = """<style>
+body { font-family: sans-serif; max-width: 800px; margin: auto; padding: 2em; }
+code { background: #f4f4f4; padding: 2px 4px; border-radius: 3px; }
+</style>
+"""
+
+
+def compile_line(line):
+    """Apply all inline transformations to a single line."""
+    line = compile_headers(line)
+    line = compile_images(line)
+    line = compile_links(line)
+    line = compile_bold_stars(line)
+    line = compile_bold_underscore(line)
+    line = compile_strikethrough(line)
+    line = compile_italic_star(line)
+    line = compile_italic_underscore(line)
+    line = compile_code_inline(line)
+    return line
+
+
+def convert_file(input_file, add_css):
+    """Read a markdown file, convert it to HTML, and print the result."""
+    with open(input_file, 'r', encoding='utf-8') as f:
+        lines = f.readlines()
+
+    if add_css:
+        print(CSS)
+
+    for line in lines:
+        line = line.rstrip('\n')
+        print(compile_line(line))
+
 
 def main():
     # process command line arguments
     import argparse
     parser = argparse.ArgumentParser()
     parser.add_argument('--input_file', required=True)
-    # FIXME:
-    # to get the command_lines test to pass,
-    # you will need to uncomment the line below;
-    # then add the args.add_css variable as a parameter to convert_file
-    #parser.add_argument('--add_css', action='store_true')
+    parser.add_argument('--add_css', action='store_true')
     args = parser.parse_args()
 
     # call the main function
-    convert_file(args.input_file, False)
+    convert_file(args.input_file, args.add_css)
+
 
 if __name__ == '__main__':
     main()
